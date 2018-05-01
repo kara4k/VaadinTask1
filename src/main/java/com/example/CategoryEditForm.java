@@ -1,5 +1,7 @@
 package com.example;
 
+import com.example.entities.Category;
+import com.example.service.CategoryService;
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.ui.*;

@@ -1,6 +1,9 @@
 package com.example;
 
-import com.vaadin.data.*;
+import com.example.entities.Hotel;
+import com.vaadin.data.Binder;
+import com.vaadin.data.ValidationResult;
+import com.vaadin.data.ValueContext;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -10,14 +13,16 @@ import java.util.Calendar;
 public class HotelFormBinder {
 
     public static LocalDate getDate(Hotel hotel) {
-        if (hotel.getOperatesFrom() == null) return LocalDate.now().minusDays(1);
+        if (hotel.getOperatesFrom() == null) return null;
 
         return Instant.ofEpochMilli(hotel.getOperatesFrom())
                 .atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
     public void bindForm(Binder<Hotel> binder, HotelEditForm form) {
-        binder.forField(form.name).asRequired("Please, enter a name!").bind(Hotel::getName, Hotel::setName);
+        binder.forField(form.name).asRequired("Please, enter a name!")
+                .bind(Hotel::getName, Hotel::setName);
+
         binder.forField(form.address).asRequired("Please, enter a address!")
                 .bind(Hotel::getAddress, Hotel::setAddress);
 
@@ -31,6 +36,7 @@ public class HotelFormBinder {
 
         binder.forField(form.category).asRequired("Please, choose a category!")
                 .bind(Hotel::getCategory, Hotel::setCategory);
+
         binder.forField(form.description).bind(Hotel::getDescription, Hotel::setDescription);
         binder.forField(form.url).asRequired("Please, enter a URL!").bind(Hotel::getUrl, Hotel::setUrl);
 

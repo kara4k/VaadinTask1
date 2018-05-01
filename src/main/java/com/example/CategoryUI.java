@@ -1,5 +1,7 @@
 package com.example;
 
+import com.example.entities.Category;
+import com.example.service.CategoryService;
 import com.vaadin.event.selection.MultiSelectionListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -9,6 +11,7 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
+import java.util.List;
 import java.util.Set;
 
 public class CategoryUI extends VerticalLayout implements View {
@@ -96,7 +99,7 @@ public class CategoryUI extends VerticalLayout implements View {
     }
 
     public void updateList() {
-        Set<Category> categorySet = mCategoryService.getCategorySet();
+        List<Category> categorySet = mCategoryService.getAll();
         mGrid.setItems(categorySet);
     }
 }

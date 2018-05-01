@@ -1,5 +1,8 @@
 package com.example;
 
+import com.example.entities.Hotel;
+import com.example.service.CategoryService;
+import com.example.service.HotelService;
 import com.vaadin.event.selection.MultiSelectionListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -122,7 +125,7 @@ public class HotelUI extends VerticalLayout implements View {
     }
 
     public void updateList() {
-        List<Hotel> hotelList = hotelService.findAll(filterNameTF.getValue(), filterAdressTF.getValue());
+        List<Hotel> hotelList = hotelService.getAll(filterNameTF.getValue(), filterAdressTF.getValue());
         hotelGrid.setItems(hotelList);
     }
 

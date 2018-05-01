@@ -1,5 +1,9 @@
 package com.example;
 
+import com.example.entities.Category;
+import com.example.entities.Hotel;
+import com.example.service.CategoryService;
+import com.example.service.HotelService;
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.ui.*;
@@ -57,13 +61,25 @@ public class HotelEditForm extends FormLayout {
             } catch (ValidationException e) {
                 Notification.show("Unable to save! " + e.getMessage(), Notification.Type.ERROR_MESSAGE);
             }
+
+            //NativeSelect empty value issue check
+            Category c = mCategoryService.get(mHotel.getCategory().getId());
+            if (c == null) {
+                showUnableSaveMsg();
+                return;
+            }
+
             mHotelService.save(mHotel);
             mUi.updateList();
             close();
         } else {
-            Notification.show("Unable to save! Please review errors and fix them.",
-                    Notification.Type.ERROR_MESSAGE);
+            showUnableSaveMsg();
         }
+    }
+
+    private void showUnableSaveMsg() {
+        Notification.show("Unable to save! Please review errors and fix them.",
+                Notification.Type.ERROR_MESSAGE);
     }
 
     private void close() {
@@ -71,13 +87,18 @@ public class HotelEditForm extends FormLayout {
     }
 
     private void updateCategories() {
-        category.setItems(mCategoryService.getCategorySet());
+        category.setItems(mCategoryService.getAll());
     }
 
     public void showHotel(Hotel hotel) {
         mHotel = hotel;
-        updateCategories();
         mBinder.readBean(this.mHotel);
+        updateCategories();
+        categoryUpdateTrick(); // TODO: 27.04.2018
         setVisible(true);
+    }
+
+    private void categoryUpdateTrick() {
+        if (mHotel.getCategory() != null) mBinder.readBean(this.mHotel);
     }
 }
