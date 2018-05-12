@@ -6,17 +6,13 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.ContextLoaderListener;
 
-import javax.servlet.annotation.WebListener;
 import javax.servlet.annotation.WebServlet;
 
 /**
@@ -30,15 +26,6 @@ import javax.servlet.annotation.WebServlet;
 @SpringUI
 public class MainUI extends UI {
 
-    @WebListener
-    public static class MyContextLoaderListener extends ContextLoaderListener {
-    }
-
-    @Configuration
-    @EnableVaadin
-    public static class MyConfiguration {
-    }
-
     public static final String HOTELS = "";
     public static final String CATEGORY = "category";
 
@@ -47,7 +34,6 @@ public class MainUI extends UI {
 
     final VerticalLayout layout = new VerticalLayout();
     final MenuBar menuBar = new MenuBar();
-
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {

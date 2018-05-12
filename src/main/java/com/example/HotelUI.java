@@ -23,12 +23,13 @@ public class HotelUI extends VerticalLayout implements View {
     final Button addHotelBtn = new Button("Add hotel");
     final Button deleteHotelBtn = new Button("Delete hotel");
     final Button editHotelBtn = new Button("Edit hotel");
+    final Button bulkUpdateBtn = new Button("Bulk Update");
     final Grid<Hotel> hotelGrid = new Grid<>();
     final HotelEditForm hotelForm = new HotelEditForm(this);
+    final UpdatePopup updatePopup = new UpdatePopup(this);
 
     final HotelService hotelService = HotelService.getInstance();
     final CategoryService mCategoryService = CategoryService.getInstance();
-
 
     public HotelUI() {
         setupLayout();
@@ -43,12 +44,16 @@ public class HotelUI extends VerticalLayout implements View {
 
     private void setupLayout() {
 
-        controlsLayout.addComponents(filterNameTF, filterAdressTF, addHotelBtn, deleteHotelBtn, editHotelBtn);
+        controlsLayout.addComponents(filterNameTF, filterAdressTF, addHotelBtn,
+                deleteHotelBtn, editHotelBtn, bulkUpdateBtn);
         deleteHotelBtn.setEnabled(false);
         editHotelBtn.setEnabled(false);
+        bulkUpdateBtn.setEnabled(false);
         contentLayout.addComponents(hotelGrid, hotelForm);
+        updatePopup.setPopupVisible(false);
 
-        addComponents(controlsLayout, contentLayout);
+        addComponents(controlsLayout, contentLayout, updatePopup);
+        setComponentAlignment(updatePopup, Alignment.MIDDLE_CENTER);
 
         contentLayout.setWidth(100, Unit.PERCENTAGE);
         hotelGrid.setWidth(100, Unit.PERCENTAGE);
@@ -88,12 +93,15 @@ public class HotelUI extends VerticalLayout implements View {
             if (allSelectedItems.isEmpty()) {
                 deleteHotelBtn.setEnabled(false);
                 editHotelBtn.setEnabled(false);
+                bulkUpdateBtn.setEnabled(false);
             } else if (allSelectedItems.size() == 1) {
                 deleteHotelBtn.setEnabled(true);
                 editHotelBtn.setEnabled(true);
+                bulkUpdateBtn.setEnabled(false);
             } else {
                 deleteHotelBtn.setEnabled(true);
                 editHotelBtn.setEnabled(false);
+                bulkUpdateBtn.setEnabled(true);
             }
         });
 
@@ -116,6 +124,10 @@ public class HotelUI extends VerticalLayout implements View {
             hotelForm.showHotel(hotel);
         });
 
+        bulkUpdateBtn.addClickListener(e -> {
+            updatePopup.show(hotelGrid.getSelectedItems());
+        });
+
         filterNameTF.addValueChangeListener(e -> updateList());
         filterAdressTF.addValueChangeListener(e -> updateList());
     }
@@ -129,4 +141,8 @@ public class HotelUI extends VerticalLayout implements View {
         hotelGrid.setItems(hotelList);
     }
 
+    public void onUpdateHotels(Set<Hotel> hotels) {
+        hotelService.updateHotels(hotels);
+        updateList();
+    }
 }

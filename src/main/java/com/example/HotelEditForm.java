@@ -69,6 +69,7 @@ public class HotelEditForm extends FormLayout {
                 return;
             }
 
+
             mHotelService.save(mHotel);
             mUi.updateList();
             close();

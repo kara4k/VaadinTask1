@@ -27,11 +27,11 @@ public class HotelFormBinder {
                 .bind(Hotel::getAddress, Hotel::setAddress);
 
         binder.forField(form.rating).asRequired("Please, enter a rating!")
-                .withValidator(this::validateRating)
+                .withValidator(HotelFormBinder::validateRating)
                 .bind(this::getRating, this::setRating);
 
         binder.forField(form.operatesFrom).asRequired("Please, choose a date!")
-                .withValidator(this::validateDate)
+                .withValidator(HotelFormBinder::validateDate)
                 .bind(HotelFormBinder::getDate, this::setDate);
 
         binder.forField(form.category).asRequired("Please, choose a category!")
@@ -49,7 +49,7 @@ public class HotelFormBinder {
         form.url.setDescription("Hotel URL");
     }
 
-    public ValidationResult validateRating(String s, ValueContext valueContext) {
+    public static ValidationResult validateRating(String s, ValueContext valueContext) {
         try {
             int rating = Integer.parseInt(s);
 
@@ -62,7 +62,7 @@ public class HotelFormBinder {
         }
     }
 
-    public ValidationResult validateDate(LocalDate localDate, ValueContext valueContext) {
+    public static ValidationResult validateDate(LocalDate localDate, ValueContext valueContext) {
         if (localDate.isBefore(LocalDate.now())) {
             return ValidationResult.ok();
         }
@@ -80,12 +80,16 @@ public class HotelFormBinder {
     }
 
     public void setDate(Hotel hotel, LocalDate localDate) {
+        hotel.setOperatesFrom(getTimeStamp(localDate));
+    }
+
+    public static long getTimeStamp(LocalDate localDate) {
         Calendar calendar = Calendar.getInstance();
         int year = localDate.getYear();
         int month = localDate.getMonthValue() - 1;
         int day = localDate.getDayOfMonth();
 
         calendar.set(year, month, day, 0, 0);
-        hotel.setOperatesFrom(calendar.getTimeInMillis());
+        return calendar.getTimeInMillis();
     }
 }

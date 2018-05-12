@@ -55,6 +55,14 @@ public class HotelService {
         }
     }
 
+    public void updateHotels(Iterable<Hotel> iterable) {
+        mEntityManager.getTransaction().begin();
+        iterable.forEach(hotel -> {
+            mEntityManager.merge(hotel);
+        });
+        mEntityManager.getTransaction().commit();
+    }
+
     public void delete(Iterable<Hotel> hotels) {
         mEntityManager.getTransaction().begin();
         hotels.forEach(hotel -> {
