@@ -155,4 +155,18 @@
         </rollback>
     </changeSet>
 
+
+    <!-- ================================= Add payment columns ================================= -->
+    <changeSet id="adding payments columns" author="kara4k">
+        <addColumn tableName="HOTEL">
+            <column name="PAYMENT_TYPE" type="TINYINT"/>
+            <column name="PREPAYMENT" type="TINYINT"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn columnName="PAYMENT_TYPE" tableName="HOTEL"/>
+            <dropColumn columnName="PREPAYMENT" tableName="HOTEL"/>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

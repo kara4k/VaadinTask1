@@ -158,9 +158,9 @@ public class UpdatePopup extends PopupView {
         }
     }
 
-    private boolean isValid(ValidationResult operatesValidation) {
-        if (operatesValidation.isError()) {
-            showError(operatesValidation.getErrorMessage());
+    private boolean isValid(ValidationResult result) {
+        if (result.isError()) {
+            showError(result.getErrorMessage());
             return false;
         }
         return true;

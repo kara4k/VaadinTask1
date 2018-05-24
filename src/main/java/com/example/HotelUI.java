@@ -3,15 +3,17 @@ package com.example;
 import com.example.entities.Hotel;
 import com.example.service.CategoryService;
 import com.example.service.HotelService;
+import com.vaadin.data.provider.DataProvider;
+import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.event.selection.MultiSelectionListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.SerializablePredicate;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.renderers.HtmlRenderer;
 
-import java.util.List;
 import java.util.Set;
 
 public class HotelUI extends VerticalLayout implements View {
@@ -25,11 +27,13 @@ public class HotelUI extends VerticalLayout implements View {
     final Button editHotelBtn = new Button("Edit hotel");
     final Button bulkUpdateBtn = new Button("Bulk Update");
     final Grid<Hotel> hotelGrid = new Grid<>();
+
     final HotelEditForm hotelForm = new HotelEditForm(this);
     final UpdatePopup updatePopup = new UpdatePopup(this);
 
     final HotelService hotelService = HotelService.getInstance();
     final CategoryService mCategoryService = CategoryService.getInstance();
+    private ListDataProvider<Hotel> dataProvider;
 
     public HotelUI() {
         setupLayout();
@@ -60,7 +64,7 @@ public class HotelUI extends VerticalLayout implements View {
         hotelForm.setMargin(new MarginInfo(false, false, false, true));
         hotelForm.setVisible(false);
         contentLayout.setExpandRatio(hotelGrid, 3.0f);
-        contentLayout.setExpandRatio(hotelForm, 1.0f);
+        contentLayout.setExpandRatio(hotelForm, 2.0f);
 
         hotelGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         hotelGrid.addColumn(Hotel::getName).setCaption("Name");
@@ -128,8 +132,21 @@ public class HotelUI extends VerticalLayout implements View {
             updatePopup.show(hotelGrid.getSelectedItems());
         });
 
-        filterNameTF.addValueChangeListener(e -> updateList());
-        filterAdressTF.addValueChangeListener(e -> updateList());
+        filterNameTF.addValueChangeListener(e -> filterHotels());
+        filterAdressTF.addValueChangeListener(e -> filterHotels());
+    }
+
+    private void filterHotels() {
+        dataProvider.setFilter((SerializablePredicate<Hotel>) hotel -> {
+            boolean namePasses = isPasses(hotel.getName(), filterNameTF.getValue());
+            boolean addressPasses = isPasses(hotel.getAddress(), filterAdressTF.getValue());
+
+            return (namePasses && addressPasses);
+        });
+    }
+
+    private boolean isPasses(String text, String filter) {
+        return (filter == null || filter.isEmpty() || text.toLowerCase().contains(filter.toLowerCase()));
     }
 
     private void hideForm() {
@@ -137,8 +154,8 @@ public class HotelUI extends VerticalLayout implements View {
     }
 
     public void updateList() {
-        List<Hotel> hotelList = hotelService.getAll(filterNameTF.getValue(), filterAdressTF.getValue());
-        hotelGrid.setItems(hotelList);
+        dataProvider = DataProvider.ofCollection(hotelService.getAll());
+        hotelGrid.setDataProvider(dataProvider);
     }
 
     public void onUpdateHotels(Set<Hotel> hotels) {

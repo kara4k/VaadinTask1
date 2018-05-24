@@ -35,17 +35,31 @@ public class Hotel {
     private Long operatesFrom;
 
     @NotFound
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CATEGORY_ID",
             referencedColumnName = "ID",
             foreignKey = @ForeignKey(name = "FK_HOTEL_CATEGORY"))
     private Category category;
+
+    @Embedded
+    private Payment payment;
 
     @Column(name = "DESCRIPTION")
     private String description;
 
     @Column(name = "URL")
     private String url;
+
+    public Hotel() {
+    }
+
+    public Hotel(String name, String address, Integer rating, String description, String url) {
+        this.name = name;
+        this.address = address;
+        this.rating = rating;
+        this.description = description;
+        this.url = url;
+    }
 
     public Long getId() {
         return id;
@@ -119,4 +133,11 @@ public class Hotel {
         this.url = url;
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
 }

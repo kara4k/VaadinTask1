@@ -1,9 +1,7 @@
 package com.example;
 
 import com.example.entities.Hotel;
-import com.vaadin.data.Binder;
-import com.vaadin.data.ValidationResult;
-import com.vaadin.data.ValueContext;
+import com.vaadin.data.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -35,10 +33,15 @@ public class HotelFormBinder {
                 .bind(HotelFormBinder::getDate, this::setDate);
 
         binder.forField(form.category).asRequired("Please, choose a category!")
+                .withNullRepresentation(null)
                 .bind(Hotel::getCategory, Hotel::setCategory);
 
         binder.forField(form.description).bind(Hotel::getDescription, Hotel::setDescription);
         binder.forField(form.url).asRequired("Please, enter a URL!").bind(Hotel::getUrl, Hotel::setUrl);
+
+        binder.forField(form.paymentField).asRequired("Please, choose a payment method")
+                .withValidator(form.paymentField.getDefaultValidator())
+                .bind(Hotel::getPayment, Hotel::setPayment);
 
         form.name.setDescription("Hotel name");
         form.address.setDescription("Hotel address");

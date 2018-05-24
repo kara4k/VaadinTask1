@@ -6,7 +6,10 @@ import com.example.service.CategoryService;
 import com.example.service.HotelService;
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
+import com.vaadin.data.ValidationResult;
 import com.vaadin.ui.*;
+
+import java.util.List;
 
 public class HotelEditForm extends FormLayout {
 
@@ -15,6 +18,7 @@ public class HotelEditForm extends FormLayout {
     TextField rating = new TextField("Rating");
     DateField operatesFrom = new DateField("Date");
     NativeSelect<Category> category = new NativeSelect<>("Category");
+    PaymentField paymentField = new PaymentField();
     TextArea description = new TextArea("Description");
     TextField url = new TextField("URL");
     private Button save = new Button("Save");
@@ -39,12 +43,13 @@ public class HotelEditForm extends FormLayout {
         rating.setWidth(100, Unit.PERCENTAGE);
         operatesFrom.setWidth(100, Unit.PERCENTAGE);
         category.setWidth(100, Unit.PERCENTAGE);
+        paymentField.setWidth(100, Unit.PERCENTAGE);
         description.setWidth(100, Unit.PERCENTAGE);
         url.setWidth(100, Unit.PERCENTAGE);
         save.setWidth(100, Unit.PERCENTAGE);
         close.setWidth(100, Unit.PERCENTAGE);
 
-        addComponents(name, address, rating, operatesFrom, category, description, url, buttonsLayout);
+        addComponents(name, address, rating, operatesFrom, category, paymentField, description, url, buttonsLayout);
 
         updateCategories();
 
@@ -65,22 +70,25 @@ public class HotelEditForm extends FormLayout {
             //NativeSelect empty value issue check
             Category c = mCategoryService.get(mHotel.getCategory().getId());
             if (c == null) {
-                showUnableSaveMsg();
+                Notification.show("Unable to save! Please review errors and fix them.",
+                        Notification.Type.ERROR_MESSAGE);
                 return;
             }
-
 
             mHotelService.save(mHotel);
             mUi.updateList();
             close();
         } else {
-            showUnableSaveMsg();
+            showValidationError();
         }
     }
 
-    private void showUnableSaveMsg() {
-        Notification.show("Unable to save! Please review errors and fix them.",
-                Notification.Type.ERROR_MESSAGE);
+    private void showValidationError() {
+        List<ValidationResult> validationErrors = mBinder.validate().getValidationErrors();
+        if (!validationErrors.isEmpty()) {
+            String errorMessage = validationErrors.get(0).getErrorMessage();
+            Notification.show(errorMessage, Notification.Type.ERROR_MESSAGE);
+        }
     }
 
     private void close() {
@@ -89,17 +97,13 @@ public class HotelEditForm extends FormLayout {
 
     private void updateCategories() {
         category.setItems(mCategoryService.getAll());
+        category.setItemCaptionGenerator((ItemCaptionGenerator<Category>) Category::getName);
     }
 
     public void showHotel(Hotel hotel) {
         mHotel = hotel;
-        mBinder.readBean(this.mHotel);
         updateCategories();
-        categoryUpdateTrick(); // TODO: 27.04.2018
+        mBinder.readBean(this.mHotel);
         setVisible(true);
-    }
-
-    private void categoryUpdateTrick() {
-        if (mHotel.getCategory() != null) mBinder.readBean(this.mHotel);
     }
 }

@@ -17,16 +17,21 @@ public class HotelService {
     private EntityManager mEntityManager = Persistence.createEntityManagerFactory("hotelsdb")
             .createEntityManager();
 
+    private HotelService() {
+    }
+
     public static HotelService getInstance() {
         if (sHotelService == null) sHotelService = new HotelService();
         return sHotelService;
     }
 
-    private HotelService() {
-    }
-
     public Hotel get(long id) {
         return mEntityManager.find(Hotel.class, id);
+    }
+
+    public List<Hotel> getAll() {
+        TypedQuery<Hotel> query = mEntityManager.createNamedQuery("Hotel.getAll", Hotel.class);
+        return query.getResultList();
     }
 
     public List<Hotel> getAll(@NotNull String nameFilter, @NotNull String addressFilter) {
@@ -47,12 +52,7 @@ public class HotelService {
         } else {
             mEntityManager.merge(hotel);
         }
-
-        try {
-            mEntityManager.getTransaction().commit();
-        } catch (Exception e) {
-            Logger.getLogger(HotelService.class.getName()).log(Level.SEVERE, null, e);
-        }
+        transCommit();
     }
 
     public void updateHotels(Iterable<Hotel> iterable) {
@@ -60,7 +60,7 @@ public class HotelService {
         iterable.forEach(hotel -> {
             mEntityManager.merge(hotel);
         });
-        mEntityManager.getTransaction().commit();
+        transCommit();
     }
 
     public void delete(Iterable<Hotel> hotels) {
@@ -68,7 +68,15 @@ public class HotelService {
         hotels.forEach(hotel -> {
             mEntityManager.remove(get(hotel.getId()));
         });
-        mEntityManager.getTransaction().commit();
+        transCommit();
+    }
+
+    private void transCommit() {
+        try {
+            mEntityManager.getTransaction().commit();
+        } catch (Exception e) {
+            Logger.getLogger(HotelService.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 
 }
